@@ -1,0 +1,125 @@
+!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Surprise</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Comic Sans MS', cursive; }
+        body { background: linear-gradient(135deg, #ffafbd, #ffc3a0); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .container { max-width: 800px; width: 100%; text-align: center; }
+        h1 { font-size: 3.5rem; color: #d63384; text-shadow: 3px 3px 0 #ffde59; margin: 30px 0; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        button { padding: 20px 40px; font-size: 1.8rem; background: linear-gradient(to right, #ff6b6b, #ff8e53); color: white; border: none; border-radius: 50px; cursor: pointer; margin: 20px; transition: 0.3s; }
+        button:hover { transform: scale(1.05); }
+        .timer { font-size: 1.5rem; color: #333; background: rgba(255,255,255,0.8); padding: 10px 20px; border-radius: 50px; margin: 20px; display: none; }
+        .heart { width: 400px; height: 400px; background: #ff4757; margin: 40px auto; transform: rotate(45deg); display: none; position: relative; box-shadow: 0 0 50px rgba(255,71,87,0.7); }
+        .heart:before, .heart:after { content: ''; width: 400px; height: 400px; background: #ff4757; border-radius: 50%; position: absolute; }
+        .heart:before { top: -200px; left: 0; }
+        .heart:after { top: 0; left: -200px; }
+        .heart img { position: absolute; width: 70%; height: 70%; object-fit: cover; border-radius: 10px; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); border: 8px solid white; }
+        .music-player { background: rgba(255,255,255,0.9); padding: 15px; border-radius: 15px; display: none; align-items: center; gap: 15px; margin-top: 20px; }
+        .music-control { background: #ff6b6b; color: white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 1.5rem; cursor: pointer; }
+        .instructions { background: rgba(255,255,255,0.9); padding: 15px; border-radius: 15px; margin: 20px; font-size: 1.2rem; }
+        @media (max-width: 768px) { h1 { font-size: 2.5rem; } .heart { width: 300px; height: 300px; } }
+        @media (max-width: 480px) { h1 { font-size: 2rem; } .heart { width: 250px; height: 250px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 Happy Birthday! 🎂</h1>
+        
+        <div class="instructions">
+            <p><i class="fas fa-mouse-pointer"></i> Click the button! It will run away!</p>
+            <p><i class="far fa-clock"></i> After 10 seconds, surprise appears!</p>
+        </div>
+        
+        <button id="runawayBtn"><i class="fas fa-birthday-cake"></i> Click Me! <i class="fas fa-gift"></i></button>
+        
+        <div class="timer" id="timer">Surprise in: <span id="countdown">10</span> seconds</div>
+        
+        <div class="heart" id="heart">
+            <img src="https://images.unsplash.com/photo-1511988617509-a57c8a288659?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Birthday">
+        </div>
+        
+        <div class="music-player" id="musicPlayer">
+            <button class="music-control" id="playBtn"><i class="fas fa-play"></i></button>
+            <button class="music-control" id="pauseBtn"><i class="fas fa-pause"></i></button>
+            <div>"Happy Birthday" Song</div>
+        </div>
+    </div>
+    
+    <audio id="song" src="https://assets.mixkit.co/music/preview/mixkit-happy-birthday-to-you-443.mp3"></audio>
+
+    <script>
+        const btn = document.getElementById('runawayBtn');
+        const timer = document.getElementById('timer');
+        const countdown = document.getElementById('countdown');
+        const heart = document.getElementById('heart');
+        const musicPlayer = document.getElementById('musicPlayer');
+        const audio = document.getElementById('song');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        
+        let count = 10;
+        let started = false;
+        
+        btn.addEventListener('mouseover', function() {
+            const x = Math.random() * (window.innerWidth - btn.offsetWidth - 20);
+            const y = Math.random() * (window.innerHeight - btn.offsetHeight - 20);
+            btn.style.position = 'absolute';
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
+            
+            if (!started) {
+                started = true;
+                timer.style.display = 'block';
+                const interval = setInterval(() => {
+                    count--;
+                    countdown.textContent = count;
+                    if (count <= 0) {
+                        clearInterval(interval);
+                        btn.style.display = 'none';
+                        timer.style.display = 'none';
+                        heart.style.display = 'block';
+                        musicPlayer.style.display = 'flex';
+                        audio.play();
+                        createConfetti();
+                    }
+                }, 1000);
+            }
+        });
+        
+        playBtn.addEventListener('click', () => audio.play());
+        pauseBtn.addEventListener('click', () => audio.pause());
+        
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#ffde59', '#1dd1a1', '#54a0ff'];
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.cssText = `
+                    position: fixed; width: 15px; height: 15px; background: ${colors[Math.floor(Math.random()*colors.length)]};
+                    border-radius: ${Math.random() > 0.5 ? '50%' : '0'}; left: ${Math.random()*100}vw; top: -20px;
+                    opacity: 0; z-index: 1;
+                `;
+                document.body.appendChild(confetti);
+                setTimeout(() => {
+                    confetti.style.transition = `all ${2+Math.random()}s ease-in`;
+                    confetti.style.opacity = '1';
+                    confetti.style.transform = `translateY(100vh) rotate(${Math.random()*360}deg)`;
+                    setTimeout(() => confetti.remove(), 3000);
+                }, Math.random() * 1000);
+            }
+            setInterval(createConfetti, 2000);
+        }
+        
+        // Mobile support
+        btn.addEventListener('click', function() {
+            if (!started) {
+                btn.dispatchEvent(new Event('mouseover'));
+            }
+        });
+    </script>
+</body>
+</html>
